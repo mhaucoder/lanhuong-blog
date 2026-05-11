@@ -3,242 +3,219 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { ArrowLeft, RefreshCw, CheckCircle2, XCircle, Star } from "lucide-react"
+import { ArrowLeft, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const WORD_DATA = [
-  { word: "gương mặt", category: "su-vat", hint: "Chỉ một bộ phận của cơ thể" },
-  { word: "hay", category: "dac-diem", hint: "Chỉ tính chất, phẩm chất" },
-  { word: "đông đủ", category: "dac-diem", hint: "Chỉ trạng thái, đặc điểm" },
-  { word: "bàn chân", category: "su-vat", hint: "Chỉ một bộ phận của cơ thể" },
-  { word: "áo quần", category: "su-vat", hint: "Chỉ đồ vật cụ thể" },
-  { word: "vội", category: "dac-diem", hint: "Chỉ cách thức, trạng thái" },
-  { word: "đẹp", category: "dac-diem", hint: "Chỉ tính chất, đặc điểm" },
-  { word: "bầu trời", category: "su-vat", hint: "Chỉ sự vật trong thiên nhiên" },
-  { word: "sạch sẽ", category: "dac-diem", hint: "Chỉ tính chất, trạng thái" },
-  { word: "trong xanh", category: "dac-diem", hint: "Chỉ màu sắc, đặc điểm" },
-  { word: "bạn bè", category: "su-vat", hint: "Chỉ người, danh từ" },
-  { word: "bài thơ", category: "su-vat", hint: "Chỉ sản phẩm văn học" },
+  { word: "gương mặt",  category: "su-vat" },
+  { word: "hay",        category: "dac-diem" },
+  { word: "đông đủ",   category: "dac-diem" },
+  { word: "bàn chân",  category: "su-vat" },
+  { word: "áo quần",   category: "su-vat" },
+  { word: "vội",       category: "dac-diem" },
+  { word: "đẹp",       category: "dac-diem" },
+  { word: "bầu trời",  category: "su-vat" },
+  { word: "sạch sẽ",   category: "dac-diem" },
+  { word: "trong xanh",category: "dac-diem" },
+  { word: "bạn bè",    category: "su-vat" },
+  { word: "bài thơ",   category: "su-vat" },
 ]
 
-type FeedbackState = {
-  type: "correct" | "wrong"
-  chosen: string
-  correct: string
-  hint: string
-  word: string
-} | null
-
 const catLabel = (c: string) => c === "su-vat" ? "Sự vật" : "Đặc điểm"
+type Placements = Record<string, string>
+
+/* ── SVG Mango chip ─────────────────────────────────────────── */
+function MangoChip({ word, selected = false, size = "md", onClick }: {
+  word: string; selected?: boolean; size?: "md" | "sm"; onClick?: () => void
+}) {
+  const w = size === "md" ? 96 : 80
+  const h = size === "md" ? 110 : 92
+  const fill    = "#fbbf24"
+  const fillEnd = "#f97316"
+  const stroke  = selected ? "#ffffff" : "#d97706"
+  const shadow  = selected
+    ? "drop-shadow(0 0 10px #fbbf24) drop-shadow(0 0 20px #fde68a)"
+    : "drop-shadow(0 4px 8px #fcd34d)"
+  const id = `mg-${word.replace(/\s/g, "-")}`
+
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.1, y: -3 }}
+      whileTap={{ scale: 0.92 }}
+      className="relative flex items-center justify-center cursor-pointer select-none focus:outline-none"
+      style={{ width: w, height: h }}
+    >
+      <svg viewBox="0 0 100 120" className="absolute inset-0 w-full h-full transition-all duration-200" style={{ filter: shadow }}>
+        <defs>
+          <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={fill} />
+            <stop offset="100%" stopColor={fillEnd} />
+          </linearGradient>
+        </defs>
+        <path d="M50 18 C28 18 14 36 14 58 C14 84 30 108 50 108 C70 108 86 84 86 58 C86 36 72 18 50 18 Z"
+          fill={`url(#${id})`} stroke={stroke} strokeWidth="2" />
+        <ellipse cx="38" cy="40" rx="8" ry="5" fill="white" opacity="0.25" transform="rotate(-30 38 40)" />
+        <rect x="47" y="2" width="6" height="18" rx="3" fill="#14532d" />
+        <ellipse cx="58" cy="8" rx="12" ry="5" fill="#16a34a" transform="rotate(-30 58 8)" />
+        <ellipse cx="40" cy="6" rx="9"  ry="4" fill="#22c55e" transform="rotate(25 40 6)" />
+      </svg>
+      <span
+        className={cn("relative z-10 font-black text-center leading-tight drop-shadow-sm px-1 text-amber-950",
+          size === "md" ? "text-sm" : "text-xs"
+        )}
+        style={{ maxWidth: w - 12 }}
+      >
+        {word}
+      </span>
+    </motion.button>
+  )
+}
 
 export default function WordSortingGame() {
-  const [idx, setIdx] = useState(0)
-  const [score, setScore] = useState(0)
-  const [feedback, setFeedback] = useState<FeedbackState>(null)
-  const [done, setDone] = useState(false)
-  const [started, setStarted] = useState(false)
+  const [placements, setPlacements] = useState<Placements>({})
+  const [selected, setSelected]     = useState<string | null>(null)
+  const [submitted, setSubmitted]   = useState(false)
 
-  const word = WORD_DATA[idx]
+  const unplaced  = WORD_DATA.filter(w => !placements[w.word])
+  const suVat     = WORD_DATA.filter(w => placements[w.word] === "su-vat")
+  const dacDiem   = WORD_DATA.filter(w => placements[w.word] === "dac-diem")
+  const allPlaced = unplaced.length === 0
+  const score     = WORD_DATA.filter(w => placements[w.word] === w.category).length
 
-  const choose = (cat: string) => {
-    if (feedback) return
-    const ok = word.category === cat
-    if (ok) setScore(s => s + 1)
-    setFeedback({ type: ok ? "correct" : "wrong", chosen: cat, correct: word.category, hint: word.hint, word: word.word })
+  const handleWordClick = (word: string) => {
+    setSelected(prev => prev === word ? null : word)
   }
 
-  const next = () => {
-    setFeedback(null)
-    if (idx < WORD_DATA.length - 1) setIdx(i => i + 1)
-    else setDone(true)
+  const handleBasketClick = (cat: string) => {
+    if (!selected) return
+    setPlacements(prev => ({ ...prev, [selected]: cat }))
+    setSelected(null)
   }
 
-  const restart = () => { setIdx(0); setScore(0); setFeedback(null); setDone(false) }
+  const handlePlacedClick = (word: string) => {
+    if (selected) return // while holding a mango, basket items are locked
+    setPlacements(prev => { const n = { ...prev }; delete n[word]; return n })
+  }
 
-  /* ── INTRO ────────────────────────────────────────────────────── */
-  if (!started) return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="max-w-sm w-full text-center">
-        <div className="text-7xl mb-5">🥭</div>
-        <h1 className="text-3xl font-extrabold mb-3">Phân loại từ ngữ</h1>
-        <p className="text-muted-foreground text-sm mb-8 leading-relaxed px-2">
-          Mỗi từ trên quả xoài thuộc về <strong>Sự vật</strong> hay <strong>Đặc điểm</strong>?<br />
-          Chọn đúng giỏ để ghi điểm!
-        </p>
-        <div className="grid grid-cols-2 gap-3 mb-8 text-sm text-left">
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-            <div className="text-3xl mb-2">🧺</div>
-            <div className="font-bold text-blue-700 text-base">Sự vật</div>
-            <div className="text-xs text-blue-500 mt-1">Trả lời: <em>"Cái gì? Ai?"</em></div>
-          </div>
-          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
-            <div className="text-3xl mb-2">✨</div>
-            <div className="font-bold text-orange-700 text-base">Đặc điểm</div>
-            <div className="text-xs text-orange-500 mt-1">Trả lời: <em>"Như thế nào?"</em></div>
-          </div>
-        </div>
-        <Button size="lg" onClick={() => setStarted(true)} className="rounded-full px-10 h-14 text-lg shadow-lg hover:scale-105 transition-transform">
-          Bắt đầu chơi 🎮
-        </Button>
-        <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mt-3 flex mx-auto w-fit text-muted-foreground")}>
-          <ArrowLeft size={14} className="mr-1" /> Quay lại
-        </Link>
-      </div>
-    </div>
-  )
+  const restart = () => { setPlacements({}); setSelected(null); setSubmitted(false) }
 
-  /* ── RESULT ───────────────────────────────────────────────────── */
-  if (done) {
+
+  /* ── RESULT ─────────────────────────────────────────────────── */
+  if (submitted) {
     const pct = Math.round((score / WORD_DATA.length) * 100)
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-sm w-full text-center">
-          <div className="text-7xl mb-4">{pct === 100 ? "🏆" : pct >= 70 ? "⭐" : "💪"}</div>
-          <h2 className="text-2xl font-extrabold mb-1">{pct === 100 ? "Hoàn hảo!" : pct >= 70 ? "Rất tốt!" : "Cố lên nhé!"}</h2>
-          <p className="text-muted-foreground text-sm mb-6">Bạn đã phân loại đúng</p>
-          <div className="text-7xl font-black text-primary tracking-tighter mb-2">
-            {score}<span className="text-3xl text-muted-foreground font-medium">/{WORD_DATA.length}</span>
-          </div>
-          <div className="flex gap-2 mt-8 flex-col">
-            <Button className="rounded-full h-12 text-base" onClick={restart}><RefreshCw size={16} className="mr-2" /> Chơi lại</Button>
-            <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "outline" }), "rounded-full h-12 text-base text-center")}>Quay lại danh sách</Link>
-          </div>
-        </motion.div>
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-3">{pct === 100 ? "🏆" : pct >= 70 ? "⭐" : "💪"}</div>
+          <h2 className="text-2xl font-extrabold">{pct === 100 ? "Hoàn hảo!" : pct >= 70 ? "Rất tốt!" : "Cố lên nhé!"}</h2>
+          <p className="text-muted-foreground mt-1">Đúng <span className="font-black text-primary text-2xl">{score}</span>/{WORD_DATA.length} từ</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {(["su-vat", "dac-diem"] as const).map(cat => (
+            <div key={cat} className={cn("rounded-2xl border-2 p-4", cat === "su-vat" ? "bg-blue-50 border-blue-100" : "bg-orange-50 border-orange-100")}>
+              <div className={cn("font-bold text-base mb-3", cat === "su-vat" ? "text-blue-700" : "text-orange-700")}>
+                {cat === "su-vat" ? "🧺 Sự vật" : "✨ Đặc điểm"}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {WORD_DATA.filter(w => w.category === cat).map(w => {
+                  const ok = placements[w.word] === cat
+                  return (
+                    <span key={w.word} className={cn("text-sm px-2.5 py-1 rounded-full font-semibold flex items-center gap-1", ok ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700")}>
+                      {ok ? <CheckCircle2 size={13} /> : <XCircle size={13} />} {w.word}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button className="rounded-full h-12 text-base" onClick={restart}><RefreshCw size={16} className="mr-2" /> Chơi lại</Button>
+          <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "outline" }), "rounded-full h-12 text-base text-center")}>Quay lại</Link>
+        </div>
       </div>
     )
   }
 
-  /* ── GAME ─────────────────────────────────────────────────────── */
+  /* ── GAME ───────────────────────────────────────────────────── */
   return (
-    <div className="container mx-auto px-4 py-4 max-w-md flex flex-col gap-0">
-
-      {/* ── Top bar (fixed height) ── */}
-      <div className="flex items-center justify-between mb-6 h-9">
+    <div className="container mx-auto px-4 py-4 max-w-4xl">
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-4 h-9">
         <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground gap-1 px-2")}>
           <ArrowLeft size={15} /> Thoát
         </Link>
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-28 bg-muted rounded-full overflow-hidden">
-            <motion.div className="h-full bg-primary rounded-full" animate={{ width: `${((idx + 1) / WORD_DATA.length) * 100}%` }} transition={{ duration: 0.4 }} />
-          </div>
-          <span className="text-xs text-muted-foreground font-medium w-10 text-right">{idx + 1}/{WORD_DATA.length}</span>
-        </div>
-        <div className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-bold">
-          <Star size={13} className="fill-primary" /> {score}
-        </div>
-      </div>
-
-      {/* ── Mango area (fixed height) ── */}
-      <div className="flex items-center justify-center h-64">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.25 }}
-            className="relative"
-          >
-            <div className="w-40 h-40 rounded-[40%_60%_60%_40%_/_40%_40%_60%_60%] bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-400 shadow-xl shadow-amber-200 flex items-center justify-center relative">
-              {/* stem */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-3 h-5 bg-green-800 rounded-full" />
-              <div className="absolute -top-7 left-1/2 w-8 h-5 bg-green-500 rounded-full rotate-[-30deg] origin-bottom-left" />
-              {/* word */}
-              <span className="text-3xl font-black text-amber-950 text-center px-4 leading-tight">
-                {word.word}
-              </span>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* ── Feedback area (ALWAYS RENDERED, fixed height ~96px) ── */}
-      <div className="h-28 mb-4 flex items-start">
-        <AnimatePresence mode="wait">
-          {feedback ? (
+        <AnimatePresence>
+          {selected && (
             <motion.div
-              key="fb"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full"
+            >
+              🥭 <b>{selected}</b> — nhấn giỏ để xếp
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <p className="text-sm text-muted-foreground">Còn <span className="font-bold text-foreground">{unplaced.length}</span></p>
+      </div>
+
+      {/* Unplaced words */}
+      <div className="rounded-2xl border-2 border-dashed border-muted-foreground/20 bg-sky-50/60 p-4 mb-5 min-h-[140px] flex flex-wrap gap-3 items-center justify-center">
+        {unplaced.length === 0
+          ? <p className="text-muted-foreground text-sm italic">✅ Tất cả đã được xếp!</p>
+          : unplaced.map(w => (
+            <MangoChip key={w.word} word={w.word} selected={selected === w.word} size="md"
+              onClick={() => handleWordClick(w.word)} />
+          ))
+        }
+      </div>
+
+      {/* Baskets */}
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        {(["su-vat", "dac-diem"] as const).map(cat => {
+          const items = cat === "su-vat" ? suVat : dacDiem
+          const active = !!selected
+          return (
+            <motion.div
+              key={cat}
+              onClick={() => handleBasketClick(cat)}
+              whileHover={active ? { scale: 1.02, y: -2 } : {}}
+              whileTap={active ? { scale: 0.98 } : {}}
               className={cn(
-                "w-full rounded-2xl px-5 py-4 border-2 flex items-start gap-4",
-                feedback.type === "correct" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                "rounded-2xl border-2 min-h-[190px] p-3 transition-all duration-200",
+                cat === "su-vat" ? "bg-blue-50" : "bg-orange-50",
+                active
+                  ? cat === "su-vat"
+                    ? "border-blue-400 cursor-pointer shadow-lg shadow-blue-100 ring-2 ring-blue-200"
+                    : "border-orange-400 cursor-pointer shadow-lg shadow-orange-100 ring-2 ring-orange-200"
+                  : cat === "su-vat" ? "border-blue-200" : "border-orange-200"
               )}
             >
-              {feedback.type === "correct"
-                ? <CheckCircle2 size={28} className="text-green-600 mt-0.5 shrink-0" />
-                : <XCircle size={28} className="text-red-600   mt-0.5 shrink-0" />
-              }
-              <div className="flex-1">
-                {feedback.type === "correct"
-                  ? <p className="font-bold text-green-800 text-xl">Chính xác! 🎉</p>
-                  : <p className="font-bold text-red-800 text-xl">
-                    <b>"{feedback.word}"</b> là <b>{catLabel(feedback.correct)}</b>
-                  </p>
-                }
-                <p className="text-muted-foreground text-lg mt-1">💡 {feedback.hint}</p>
+              <div className="text-center mb-3 pb-2 border-b border-current/10">
+                <div className="text-2xl">{cat === "su-vat" ? "🧺" : "✨"}</div>
+                <div className={cn("font-extrabold text-lg", cat === "su-vat" ? "text-blue-700" : "text-orange-700")}>
+                  {catLabel(cat)}
+                </div>
+                <div className={cn("text-xs", cat === "su-vat" ? "text-blue-400" : "text-orange-400")}>
+                  {cat === "su-vat" ? "Cái gì? Ai?" : "Như thế nào?"}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {items.map(w => (
+                  <MangoChip key={w.word} word={w.word} selected={selected === w.word} size="sm"
+                    onClick={() => handlePlacedClick(w.word)} />
+                ))}
               </div>
             </motion.div>
-          ) : (
-            /* placeholder so height doesn't collapse */
-            <div key="empty" className="w-full h-full flex items-center justify-center">
-              <p className="text-muted-foreground text-base">Chọn một giỏ bên dưới ↓</p>
-            </div>
-          )}
-        </AnimatePresence>
+          )
+        })}
       </div>
 
-      {/* ── Next button (ALWAYS RENDERED, fixed height ~56px) ── */}
-      <div className="h-14 mb-4">
-        <AnimatePresence>
-          {feedback && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <Button className="w-full rounded-xl h-14 text-lg font-bold" onClick={next}>
-                {idx < WORD_DATA.length - 1 ? "Tiếp theo →" : "Xem kết quả 🏆"}
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* ── Baskets (ALWAYS VISIBLE) ── */}
-      <div className="grid grid-cols-2 gap-4">
-        <motion.button
-          whileHover={!feedback ? { scale: 1.04, y: -4 } : {}}
-          whileTap={!feedback ? { scale: 0.97 } : {}}
-          onClick={() => choose("su-vat")}
-          disabled={!!feedback}
-          className={cn(
-            "group relative rounded-2xl border-2 bg-gradient-to-b from-blue-50 to-blue-100 transition-all p-3 flex flex-col items-center gap-1.5",
-            !feedback ? "border-blue-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100 cursor-pointer" : "border-blue-100 opacity-60 cursor-not-allowed",
-            feedback?.correct === "su-vat" && "border-green-400 opacity-100 ring-2 ring-green-300",
-            feedback?.type === "wrong" && feedback.chosen === "su-vat" && "border-red-400 opacity-100 ring-2 ring-red-300"
-          )}
-        >
-          <div className="text-4xl">🧺</div>
-          <div className="font-extrabold text-blue-700 text-xl">Sự vật</div>
-          <div className="text-blue-500 text-sm font-medium">Cái gì? Ai?</div>
-        </motion.button>
-
-        <motion.button
-          whileHover={!feedback ? { scale: 1.04, y: -4 } : {}}
-          whileTap={!feedback ? { scale: 0.97 } : {}}
-          onClick={() => choose("dac-diem")}
-          disabled={!!feedback}
-          className={cn(
-            "group relative rounded-2xl border-2 bg-gradient-to-b from-orange-50 to-orange-100 transition-all p-3 flex flex-col items-center gap-1.5",
-            !feedback ? "border-orange-200 hover:border-orange-400 hover:shadow-lg hover:shadow-orange-100 cursor-pointer" : "border-orange-100 opacity-60 cursor-not-allowed",
-            feedback?.correct === "dac-diem" && "border-green-400 opacity-100 ring-2 ring-green-300",
-            feedback?.type === "wrong" && feedback.chosen === "dac-diem" && "border-red-400 opacity-100 ring-2 ring-red-300"
-          )}
-        >
-          <div className="text-4xl">✨</div>
-          <div className="font-extrabold text-orange-700 text-xl">Đặc điểm</div>
-          <div className="text-orange-500 text-sm font-medium">Như thế nào?</div>
-        </motion.button>
-      </div>
+      <Button className="w-full h-14 rounded-xl text-lg font-bold" disabled={!allPlaced}
+        onClick={() => setSubmitted(true)}>
+        {allPlaced ? "Kiểm tra kết quả 🏆" : `Còn ${unplaced.length} từ chưa xếp`}
+      </Button>
     </div>
   )
 }

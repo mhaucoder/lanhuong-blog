@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Languages, Star, Play } from "lucide-react"
+import { ArrowLeft, Languages, Star, Play, FileDown } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
@@ -14,9 +14,20 @@ const games = [
     id: "word-sorting",
     title: "Phân loại từ ngữ",
     description: "Giúp cậu bé hái xoài và phân loại từ ngữ vào đúng giỏ Sự vật hoặc Đặc điểm nhé!",
-    image: "/images/games/tieng-viet-1.png",
+    image: "/images/games/word-sorting/game-banner.png",
     level: "Dễ",
-    time: "Không giới hạn"
+    time: "Không giới hạn",
+    pptUrl: "/files/games/ptt_word_sorting.pptx"
+  },
+  {
+    id: "amazing-race",
+    title: "Cuộc đua kỳ thú",
+    description: "Vượt qua các thử thách về từ vựng và ngữ pháp để về đích sớm nhất!",
+    image: "/images/games/amazing-race/game-banner.png",
+    level: "Trung bình",
+    time: "Không giới hạn",
+    pptUrl: "/files/games/ppt_amazing_race.pptx",
+    isOffline: true
   }
 ]
 
@@ -66,12 +77,27 @@ export default function TiengVietGames() {
                   <CardDescription className="text-xs line-clamp-2">{game.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <Link
-                    href={`/games/tieng-viet/${game.id}`}
-                    className={cn(buttonVariants({ size: "sm", className: "w-full rounded-xl" }))}
-                  >
-                    <Play size={14} className="mr-1.5 fill-current" /> Chơi ngay
-                  </Link>
+                  <div className="grid grid-cols-2 gap-2">
+                    {game.isOffline ? (
+                      <div className={cn(buttonVariants({ size: "sm", variant: "secondary", className: "w-full rounded-xl opacity-50 cursor-not-allowed" }))}>
+                        <Play size={14} className="mr-1.5" /> Offline
+                      </div>
+                    ) : (
+                      <Link
+                        href={`/games/tieng-viet/${game.id}`}
+                        className={cn(buttonVariants({ size: "sm", className: "w-full rounded-xl" }))}
+                      >
+                        <Play size={14} className="mr-1.5 fill-current" /> Chơi ngay
+                      </Link>
+                    )}
+                    <Link
+                      href={game.pptUrl || "#"}
+                      download
+                      className={cn(buttonVariants({ variant: "outline", size: "sm", className: "w-full rounded-xl text-[11px] px-1" }))}
+                    >
+                      <FileDown size={14} className="mr-1" /> Tải PowerPoint
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

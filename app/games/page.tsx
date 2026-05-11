@@ -15,7 +15,7 @@ const gameCategories = [
     description: "Ghép chữ, tìm từ đồng nghĩa và các trò chơi về tiếng Việt sáng tạo.",
     icon: Languages,
     color: "bg-pink-100 text-pink-600",
-    count: 1,
+    count: 2,
     tag: "Mới"
   },
   {
@@ -152,8 +152,8 @@ export default function GamesPage() {
                     {cat.count > 0 ? `${cat.count} trò chơi có sẵn` : "Chưa có trò chơi"}
                   </span>
                   {cat.count > 0 ? (
-                    <Link 
-                      href={cat.title === "Tiếng Việt diệu kỳ" ? "/games/tieng-viet" : "#featured-game"} 
+                    <Link
+                      href={cat.title === "Tiếng Việt diệu kỳ" ? "/games/tieng-viet" : "#featured-game"}
                       className={cn(buttonVariants({ variant: "ghost" }), "text-primary group-hover:bg-primary group-hover:text-white transition-all rounded-xl")}
                     >
                       Chơi ngay
