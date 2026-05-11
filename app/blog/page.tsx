@@ -62,10 +62,6 @@ export default function BlogPage() {
               </Button>
             ))}
           </div>
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input className="pl-10 rounded-full bg-muted/50 border-none" placeholder="Tìm kiếm bài viết..." />
-          </div>
         </div>
       </div>
 

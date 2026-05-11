@@ -88,7 +88,7 @@ export default function Home() {
               className="relative aspect-square lg:aspect-video overflow-hidden rounded-3xl shadow-2xl"
             >
               <Image
-                src="/images/hero-image.png"
+                src="/images/hero-teacher.jpg"
                 alt="Lan Hương Blog"
                 fill
                 className="object-cover"
