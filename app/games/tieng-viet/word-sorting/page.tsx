@@ -8,18 +8,18 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const WORD_DATA = [
-  { word: "gương mặt",   category: "su-vat",   hint: "Chỉ một bộ phận của cơ thể" },
-  { word: "hay",         category: "dac-diem",  hint: "Chỉ tính chất, phẩm chất" },
-  { word: "đông đủ",    category: "dac-diem",  hint: "Chỉ trạng thái, đặc điểm" },
-  { word: "bàn chân",   category: "su-vat",    hint: "Chỉ một bộ phận của cơ thể" },
-  { word: "áo quần",    category: "su-vat",    hint: "Chỉ đồ vật cụ thể" },
-  { word: "vội",        category: "dac-diem",  hint: "Chỉ cách thức, trạng thái" },
-  { word: "đẹp",        category: "dac-diem",  hint: "Chỉ tính chất, đặc điểm" },
-  { word: "bầu trời",   category: "su-vat",    hint: "Chỉ sự vật trong thiên nhiên" },
-  { word: "sạch sẽ",    category: "dac-diem",  hint: "Chỉ tính chất, trạng thái" },
-  { word: "trong xanh", category: "dac-diem",  hint: "Chỉ màu sắc, đặc điểm" },
-  { word: "bạn bè",     category: "su-vat",    hint: "Chỉ người, danh từ" },
-  { word: "bài thơ",    category: "su-vat",    hint: "Chỉ sản phẩm văn học" },
+  { word: "gương mặt", category: "su-vat", hint: "Chỉ một bộ phận của cơ thể" },
+  { word: "hay", category: "dac-diem", hint: "Chỉ tính chất, phẩm chất" },
+  { word: "đông đủ", category: "dac-diem", hint: "Chỉ trạng thái, đặc điểm" },
+  { word: "bàn chân", category: "su-vat", hint: "Chỉ một bộ phận của cơ thể" },
+  { word: "áo quần", category: "su-vat", hint: "Chỉ đồ vật cụ thể" },
+  { word: "vội", category: "dac-diem", hint: "Chỉ cách thức, trạng thái" },
+  { word: "đẹp", category: "dac-diem", hint: "Chỉ tính chất, đặc điểm" },
+  { word: "bầu trời", category: "su-vat", hint: "Chỉ sự vật trong thiên nhiên" },
+  { word: "sạch sẽ", category: "dac-diem", hint: "Chỉ tính chất, trạng thái" },
+  { word: "trong xanh", category: "dac-diem", hint: "Chỉ màu sắc, đặc điểm" },
+  { word: "bạn bè", category: "su-vat", hint: "Chỉ người, danh từ" },
+  { word: "bài thơ", category: "su-vat", hint: "Chỉ sản phẩm văn học" },
 ]
 
 type FeedbackState = {
@@ -33,11 +33,11 @@ type FeedbackState = {
 const catLabel = (c: string) => c === "su-vat" ? "Sự vật" : "Đặc điểm"
 
 export default function WordSortingGame() {
-  const [idx, setIdx]           = useState(0)
-  const [score, setScore]       = useState(0)
+  const [idx, setIdx] = useState(0)
+  const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState<FeedbackState>(null)
-  const [done, setDone]         = useState(false)
-  const [started, setStarted]   = useState(false)
+  const [done, setDone] = useState(false)
+  const [started, setStarted] = useState(false)
 
   const word = WORD_DATA[idx]
 
@@ -63,7 +63,7 @@ export default function WordSortingGame() {
         <div className="text-7xl mb-5">🥭</div>
         <h1 className="text-3xl font-extrabold mb-3">Phân loại từ ngữ</h1>
         <p className="text-muted-foreground text-sm mb-8 leading-relaxed px-2">
-          Mỗi từ trên quả xoài thuộc về <strong>Sự vật</strong> hay <strong>Đặc điểm</strong>?<br/>
+          Mỗi từ trên quả xoài thuộc về <strong>Sự vật</strong> hay <strong>Đặc điểm</strong>?<br />
           Chọn đúng giỏ để ghi điểm!
         </p>
         <div className="grid grid-cols-2 gap-3 mb-8 text-sm text-left">
@@ -101,7 +101,7 @@ export default function WordSortingGame() {
             {score}<span className="text-3xl text-muted-foreground font-medium">/{WORD_DATA.length}</span>
           </div>
           <div className="flex gap-2 mt-8 flex-col">
-            <Button className="rounded-full h-12 text-base" onClick={restart}><RefreshCw size={16} className="mr-2"/> Chơi lại</Button>
+            <Button className="rounded-full h-12 text-base" onClick={restart}><RefreshCw size={16} className="mr-2" /> Chơi lại</Button>
             <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "outline" }), "rounded-full h-12 text-base text-center")}>Quay lại danh sách</Link>
           </div>
         </motion.div>
@@ -116,21 +116,21 @@ export default function WordSortingGame() {
       {/* ── Top bar (fixed height) ── */}
       <div className="flex items-center justify-between mb-6 h-9">
         <Link href="/games/tieng-viet" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-muted-foreground gap-1 px-2")}>
-          <ArrowLeft size={15}/> Thoát
+          <ArrowLeft size={15} /> Thoát
         </Link>
         <div className="flex items-center gap-2">
           <div className="h-2 w-28 bg-muted rounded-full overflow-hidden">
-            <motion.div className="h-full bg-primary rounded-full" animate={{ width: `${((idx + 1) / WORD_DATA.length) * 100}%` }} transition={{ duration: 0.4 }}/>
+            <motion.div className="h-full bg-primary rounded-full" animate={{ width: `${((idx + 1) / WORD_DATA.length) * 100}%` }} transition={{ duration: 0.4 }} />
           </div>
           <span className="text-xs text-muted-foreground font-medium w-10 text-right">{idx + 1}/{WORD_DATA.length}</span>
         </div>
         <div className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-bold">
-          <Star size={13} className="fill-primary"/> {score}
+          <Star size={13} className="fill-primary" /> {score}
         </div>
       </div>
 
       {/* ── Mango area (fixed height) ── */}
-      <div className="flex items-center justify-center h-52 mb-6">
+      <div className="flex items-center justify-center h-64">
         <AnimatePresence mode="wait">
           <motion.div
             key={idx}
@@ -140,12 +140,12 @@ export default function WordSortingGame() {
             transition={{ duration: 0.25 }}
             className="relative"
           >
-            <div className="w-44 h-44 rounded-[40%_60%_60%_40%_/_40%_40%_60%_60%] bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-400 shadow-2xl shadow-amber-200 flex items-center justify-center relative">
+            <div className="w-40 h-40 rounded-[40%_60%_60%_40%_/_40%_40%_60%_60%] bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-400 shadow-xl shadow-amber-200 flex items-center justify-center relative">
               {/* stem */}
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-3 h-6 bg-green-800 rounded-full" />
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-3 h-5 bg-green-800 rounded-full" />
               <div className="absolute -top-7 left-1/2 w-8 h-5 bg-green-500 rounded-full rotate-[-30deg] origin-bottom-left" />
               {/* word */}
-              <span className="text-4xl font-black text-amber-950 text-center px-5 leading-tight">
+              <span className="text-3xl font-black text-amber-950 text-center px-4 leading-tight">
                 {word.word}
               </span>
             </div>
@@ -153,8 +153,8 @@ export default function WordSortingGame() {
         </AnimatePresence>
       </div>
 
-      {/* ── Feedback area (ALWAYS RENDERED, fixed height ~80px) ── */}
-      <div className="h-24 mb-5 flex items-start">
+      {/* ── Feedback area (ALWAYS RENDERED, fixed height ~96px) ── */}
+      <div className="h-28 mb-4 flex items-start">
         <AnimatePresence mode="wait">
           {feedback ? (
             <motion.div
@@ -163,39 +163,39 @@ export default function WordSortingGame() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               className={cn(
-                "w-full rounded-2xl px-4 py-3 border-2 flex items-start gap-3 text-sm",
+                "w-full rounded-2xl px-5 py-4 border-2 flex items-start gap-4",
                 feedback.type === "correct" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
               )}
             >
               {feedback.type === "correct"
-                ? <CheckCircle2 size={22} className="text-green-600 mt-0.5 shrink-0"/>
-                : <XCircle     size={22} className="text-red-600   mt-0.5 shrink-0"/>
+                ? <CheckCircle2 size={28} className="text-green-600 mt-0.5 shrink-0" />
+                : <XCircle size={28} className="text-red-600   mt-0.5 shrink-0" />
               }
               <div className="flex-1">
                 {feedback.type === "correct"
-                  ? <p className="font-bold text-green-800 text-base">Chính xác! 🎉</p>
-                  : <p className="font-bold text-red-800 text-base">
-                      <b>"{feedback.word}"</b> là <b>{catLabel(feedback.correct)}</b>
-                    </p>
+                  ? <p className="font-bold text-green-800 text-xl">Chính xác! 🎉</p>
+                  : <p className="font-bold text-red-800 text-xl">
+                    <b>"{feedback.word}"</b> là <b>{catLabel(feedback.correct)}</b>
+                  </p>
                 }
-                <p className="text-muted-foreground text-sm mt-1">💡 {feedback.hint}</p>
+                <p className="text-muted-foreground text-lg mt-1">💡 {feedback.hint}</p>
               </div>
             </motion.div>
           ) : (
             /* placeholder so height doesn't collapse */
             <div key="empty" className="w-full h-full flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Chọn một giỏ bên dưới ↓</p>
+              <p className="text-muted-foreground text-base">Chọn một giỏ bên dưới ↓</p>
             </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ── Next button (ALWAYS RENDERED, fixed height ~52px) ── */}
-      <div className="h-12 mb-5">
+      {/* ── Next button (ALWAYS RENDERED, fixed height ~56px) ── */}
+      <div className="h-14 mb-4">
         <AnimatePresence>
           {feedback && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <Button className="w-full rounded-xl h-12 text-base font-bold" onClick={next}>
+              <Button className="w-full rounded-xl h-14 text-lg font-bold" onClick={next}>
                 {idx < WORD_DATA.length - 1 ? "Tiếp theo →" : "Xem kết quả 🏆"}
               </Button>
             </motion.div>
@@ -211,14 +211,14 @@ export default function WordSortingGame() {
           onClick={() => choose("su-vat")}
           disabled={!!feedback}
           className={cn(
-            "group relative rounded-3xl border-2 bg-gradient-to-b from-blue-50 to-blue-100 transition-all p-5 flex flex-col items-center gap-2",
+            "group relative rounded-2xl border-2 bg-gradient-to-b from-blue-50 to-blue-100 transition-all p-3 flex flex-col items-center gap-1.5",
             !feedback ? "border-blue-200 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100 cursor-pointer" : "border-blue-100 opacity-60 cursor-not-allowed",
             feedback?.correct === "su-vat" && "border-green-400 opacity-100 ring-2 ring-green-300",
             feedback?.type === "wrong" && feedback.chosen === "su-vat" && "border-red-400 opacity-100 ring-2 ring-red-300"
           )}
         >
-          <div className="text-5xl">🧺</div>
-          <div className="font-extrabold text-blue-700 text-2xl">Sự vật</div>
+          <div className="text-4xl">🧺</div>
+          <div className="font-extrabold text-blue-700 text-xl">Sự vật</div>
           <div className="text-blue-500 text-sm font-medium">Cái gì? Ai?</div>
         </motion.button>
 
@@ -228,14 +228,14 @@ export default function WordSortingGame() {
           onClick={() => choose("dac-diem")}
           disabled={!!feedback}
           className={cn(
-            "group relative rounded-3xl border-2 bg-gradient-to-b from-orange-50 to-orange-100 transition-all p-5 flex flex-col items-center gap-2",
+            "group relative rounded-2xl border-2 bg-gradient-to-b from-orange-50 to-orange-100 transition-all p-3 flex flex-col items-center gap-1.5",
             !feedback ? "border-orange-200 hover:border-orange-400 hover:shadow-lg hover:shadow-orange-100 cursor-pointer" : "border-orange-100 opacity-60 cursor-not-allowed",
             feedback?.correct === "dac-diem" && "border-green-400 opacity-100 ring-2 ring-green-300",
             feedback?.type === "wrong" && feedback.chosen === "dac-diem" && "border-red-400 opacity-100 ring-2 ring-red-300"
           )}
         >
-          <div className="text-5xl">✨</div>
-          <div className="font-extrabold text-orange-700 text-2xl">Đặc điểm</div>
+          <div className="text-4xl">✨</div>
+          <div className="font-extrabold text-orange-700 text-xl">Đặc điểm</div>
           <div className="text-orange-500 text-sm font-medium">Như thế nào?</div>
         </motion.button>
       </div>
